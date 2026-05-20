@@ -1,0 +1,40 @@
+/* ==========================================================
+   BASE — Design tokens, reset, tipografia
+========================================================== */
+:root {
+  --navy:      #1E3A5F;
+  --blue:      #2563EB;
+  --blue-dk:   #1E40AF;
+  --blue-bg:   #EFF6FF;
+  --bg:        #F1F5F9;
+  --card:      #FFFFFF;
+  --text:      #1E293B;
+  --muted:     #64748B;
+  --border:    #E2E8F0;
+  --shadow:    0 2px 8px rgba(0,0,0,0.07);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.13);
+  --radius:    16px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+
+  --red:        #DC2626; --red-bg:    #FEF2F2; --red-bd:   #FECACA;
+  --orange:     #EA580C; --orange-bg: #FFF7ED; --orange-bd:#FED7AA;
+  --yellow:     #B45309; --yellow-bg: #FFFBEB; --yellow-bd:#FDE68A;
+  --green:      #15803D; --green-bg:  #F0FDF4; --green-bd: #BBF7D0;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img    { max-width: 100%; display: block; }
+button { cursor: pointer; font-family: inherit; }

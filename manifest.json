@@ -1,0 +1,19 @@
+{
+  "name": "OrdemFácil",
+  "short_name": "OrdemFácil",
+  "description": "Gestão de Ordens de Serviço e Ponto Eletrônico",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1E3A5F",
+  "background_color": "#F1F5F9",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

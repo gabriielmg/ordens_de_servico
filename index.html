@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1E3A5F">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="OrdemFácil">
+  <title>OrdemFácil</title>
+
+  <link rel="icon"     type="image/svg+xml" href="favicon.svg">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Fontes -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+  <!-- Estilos modularizados -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/screens.css">
+
+  <!-- Supabase SDK (necessário antes dos módulos JS) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- ================================================
+     SCREEN: LOGIN
+================================================ -->
+<div id="screen-login" class="screen active">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <span class="material-icons-round">build_circle</span>
+      </div>
+      <div class="login-title">Ordem<span>Fácil</span></div>
+      <div class="login-subtitle">Sistema de Ordens de Serviço</div>
+    </div>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">E-mail</label>
+        <input class="form-input" type="email" id="loginEmail"
+               placeholder="seu@email.com" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="loginPass">Senha</label>
+        <div style="position:relative;">
+          <input class="form-input" type="password" id="loginPass"
+                 placeholder="••••••••" autocomplete="current-password"
+                 style="padding-right:3rem;" required>
+          <button type="button" id="togglePass"
+                  style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);
+                         background:none;border:none;cursor:pointer;color:var(--muted);
+                         display:flex;align-items:center;padding:0.25rem;"
+                  onclick="(function(btn){
+                    var inp = document.getElementById('loginPass');
+                    var show = inp.type === 'password';
+                    inp.type = show ? 'text' : 'password';
+                    btn.querySelector('.material-icons-round').textContent = show ? 'visibility_off' : 'visibility';
+                  })(this)"
+                  tabindex="-1" title="Mostrar/ocultar senha">
+            <span class="material-icons-round" style="font-size:1.35rem;">visibility</span>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" type="submit" id="loginBtn">
+        <span class="material-icons-round">login</span> Entrar
+      </button>
+    </form>
+    <p id="authMsg"></p>
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN: COLABORADOR HOME
+================================================ -->
+<div id="screen-colab-home" class="screen">
+  <header class="app-header">
+    <div class="header-brand">Ordem<span>Fácil</span></div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="Auth.logout()" title="Sair">
+        <span class="material-icons-round">logout</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="home-body">
+    <div class="home-greeting">
+      <h2 id="greetingMsg">Olá!</h2>
+      <p  id="greetingDate"></p>
+    </div>
+
+    <button id="colabBtnOS" class="home-big-btn home-big-btn--os" onclick="Router.go('os')">
+      <span class="material-icons-round">assignment</span>
+      Ordens de Serviço
+    </button>
+
+    <button id="colabBtnPonto" class="home-big-btn home-big-btn--ponto" onclick="Ponto.init()">
+      <span class="material-icons-round">fingerprint</span>
+      Bater Ponto
+    </button>
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN: OS LIST
+================================================ -->
+<div id="screen-os" class="screen">
+  <header class="app-header">
+    <div class="header-left">
+      <button class="btn-back" id="osBtnBack">
+        <span class="material-icons-round">arrow_back</span>
+      </button>
+      <span class="header-title">Ordens de Serviço</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="reloadBtn" onclick="OS.reload()" title="Atualizar">
+        <span class="material-icons-round">refresh</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="os-body">
+    <!-- KPI Cards -->
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card kpi-card--total"   onclick="OS.setFilter('all')"       data-kpi="all"       tabindex="0">
+        <div class="kpi-icon"><span class="material-icons-round">assignment</span></div>
+        <div>
+          <div class="kpi-num" id="kpiTotal">—</div>
+          <div class="kpi-lbl">Total de OS</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-card--overdue" onclick="OS.setFilter('overdue')"   data-kpi="overdue"   tabindex="0">
+        <div class="kpi-icon"><span class="material-icons-round">error</span></div>
+        <div class="kpi-num" id="kpiOverdue">—</div>
+        <div class="kpi-lbl">Vencidas</div>
+      </div>
+      <div class="kpi-card kpi-card--today"   onclick="OS.setFilter('today')"     data-kpi="today"     tabindex="0">
+        <div class="kpi-icon"><span class="material-icons-round">warning</span></div>
+        <div class="kpi-num" id="kpiToday">—</div>
+        <div class="kpi-lbl">Vence Hoje</div>
+      </div>
+      <div class="kpi-card kpi-card--week"    onclick="OS.setFilter('week')"      data-kpi="week"      tabindex="0">
+        <div class="kpi-icon"><span class="material-icons-round">schedule</span></div>
+        <div class="kpi-num" id="kpiWeek">—</div>
+        <div class="kpi-lbl">Esta Semana</div>
+      </div>
+      <div class="kpi-card kpi-card--fort"    onclick="OS.setFilter('fortnight')" data-kpi="fortnight" tabindex="0">
+        <div class="kpi-icon"><span class="material-icons-round">event_available</span></div>
+        <div class="kpi-num" id="kpiFort">—</div>
+        <div class="kpi-lbl">Próx. 14 Dias</div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <span class="material-icons-round">search</span>
+      <input class="search-input" type="search" id="osSearch"
+             placeholder="Buscar assunto, OS ou capela…" oninput="OS.render()">
+    </div>
+
+    <!-- Filtros por prazo -->
+    <div class="pills-scroll" role="group">
+      <button class="pill active" data-f="all"       onclick="OS.setFilter('all')">Todas</button>
+      <button class="pill"        data-f="overdue"   onclick="OS.setFilter('overdue')">🔴 Vencidas</button>
+      <button class="pill"        data-f="today"     onclick="OS.setFilter('today')">🟠 Hoje</button>
+      <button class="pill"        data-f="week"      onclick="OS.setFilter('week')">🟡 Esta Semana</button>
+      <button class="pill"        data-f="fortnight" onclick="OS.setFilter('fortnight')">🟢 14 Dias</button>
+    </div>
+
+    <!-- Filtro por capela -->
+    <select class="chapel-select" id="chapelSelect" onchange="OS.render()">
+      <option value="">Todas as Capelas</option>
+    </select>
+
+    <div class="list-header">
+      <span class="list-header-title">Ordens de Serviço</span>
+      <span class="list-header-count" id="osCount"></span>
+    </div>
+
+    <div class="os-list" id="osList">
+      <div class="state-box">
+        <div class="spinner"></div>
+        <p>Carregando ordens…</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN: BATER PONTO
+================================================ -->
+<div id="screen-ponto" class="screen">
+  <header class="app-header">
+    <div class="header-left">
+      <button class="btn-back" onclick="Ponto.cancel()">
+        <span class="material-icons-round">arrow_back</span>
+      </button>
+      <span class="header-title">Bater Ponto</span>
+    </div>
+  </header>
+
+  <div class="ponto-body">
+
+    <!-- Card: tipo de ponto (visível nos steps location e camera) -->
+    <div class="ponto-tipo-card" id="pontoTipoCard" style="display:none;">
+      <span class="material-icons-round" id="pontoTipoIcon">login</span>
+      <div>
+        <div class="ponto-tipo-nome" id="pontoTipoNome">Entrada</div>
+        <div class="ponto-tipo-desc" id="pontoTipoDesc">Início do expediente</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Obtendo localização -->
+    <div class="ponto-step active" id="ponto-step-location">
+      <div class="ponto-location-card">
+        <div class="spinner" style="margin:0 auto 1rem;"></div>
+        <h3>Obtendo sua localização…</h3>
+        <p>Aguarde enquanto verificamos sua posição GPS.</p>
+      </div>
+    </div>
+
+    <!-- Step 2: Câmera -->
+    <div class="ponto-step" id="ponto-step-camera">
+      <p style="font-size:0.9rem;color:var(--muted);text-align:center;font-weight:600;">
+        Posicione seu rosto no centro e tire a foto.
+      </p>
+      <div class="camera-wrap">
+        <video id="cameraVideo" autoplay playsinline muted></video>
+        <img   id="capturedImg" alt="Foto capturada">
+      </div>
+      <div style="display:flex;gap:0.75rem;justify-content:center;align-items:center;">
+        <button class="btn btn-ghost btn-sm" id="retakeBtn"
+                onclick="Ponto.retake()" style="display:none;">
+          <span class="material-icons-round">refresh</span> Tentar novamente
+        </button>
+        <button class="capture-btn" id="captureBtn" onclick="Ponto.capture()" title="Tirar foto">
+          <span class="material-icons-round">camera_alt</span>
+        </button>
+        <button class="btn btn-primary btn-sm" id="confirmBtn"
+                onclick="Ponto.confirm()" style="display:none;">
+          <span class="material-icons-round">check</span> Confirmar
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Salvando -->
+    <div class="ponto-step" id="ponto-step-saving">
+      <div class="ponto-location-card">
+        <div class="spinner" style="margin:0 auto 1rem;"></div>
+        <h3>Registrando ponto…</h3>
+        <p>Enviando foto e validando localização.</p>
+      </div>
+    </div>
+
+    <!-- Step 4: Sucesso -->
+    <div class="ponto-step" id="ponto-step-success">
+      <div class="ponto-result success">
+        <div class="result-icon"><span class="material-icons-round">check_circle</span></div>
+        <h3 id="pontoSuccessTitle">Ponto registrado!</h3>
+        <p  id="pontoSuccessMsg">Seu ponto foi salvo com sucesso.</p>
+      </div>
+      <div id="pontoTimeline"
+           style="background:var(--card);border-radius:var(--radius);padding:1rem 1.1rem;box-shadow:var(--shadow);margin-top:0.5rem;"></div>
+      <button class="btn btn-primary btn-full" onclick="Router.goHome()">
+        <span class="material-icons-round">home</span> Voltar ao início
+      </button>
+    </div>
+
+    <!-- Step 5: Erro -->
+    <div class="ponto-step" id="ponto-step-error">
+      <div class="ponto-result error">
+        <div class="result-icon"><span class="material-icons-round">location_off</span></div>
+        <h3 id="pontoErrorTitle">Localização não autorizada</h3>
+        <p  id="pontoErrorMsg">Você não está em um local autorizado para bater ponto.</p>
+      </div>
+      <button class="btn btn-ghost btn-full" onclick="Router.goHome()">
+        <span class="material-icons-round">home</span> Voltar ao início
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN: ADMIN HOME
+================================================ -->
+<div id="screen-admin-home" class="screen">
+  <header class="app-header">
+    <div class="header-brand">Ordem<span>Fácil</span></div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="Auth.logout()" title="Sair">
+        <span class="material-icons-round">logout</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="home-body">
+    <div class="home-greeting">
+      <h2 id="adminGreetingMsg">Olá!</h2>
+      <p  id="adminGreetingDate"></p>
+    </div>
+
+    <button class="home-big-btn home-big-btn--os" onclick="Router.go('os')">
+      <span class="material-icons-round">assignment</span>
+      Ordens de Serviço
+    </button>
+
+    <button class="home-big-btn home-big-btn--ponto" onclick="Ponto.init()">
+      <span class="material-icons-round">fingerprint</span>
+      Bater Ponto
+    </button>
+
+    <button class="home-big-btn home-big-btn--gestao" onclick="Admin.init(); Router.go('admin')">
+      <span class="material-icons-round">admin_panel_settings</span>
+      Gestão
+    </button>
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN: ADMIN GESTÃO
+================================================ -->
+<div id="screen-admin" class="screen">
+  <header class="app-header">
+    <div class="header-left">
+      <button class="btn-back" onclick="Router.go('admin-home')">
+        <span class="material-icons-round">arrow_back</span>
+      </button>
+      <span class="header-title">Gestão</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="Auth.logout()" title="Sair">
+        <span class="material-icons-round">logout</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Abas -->
+  <nav class="admin-tabs" role="tablist">
+    <button class="admin-tab active" data-tab="dashboard"     onclick="Admin.tab('dashboard')">
+      <span class="material-icons-round">dashboard</span> Início
+    </button>
+    <button class="admin-tab"        data-tab="pontos"        onclick="Admin.tab('pontos')">
+      <span class="material-icons-round">fingerprint</span> Pontos
+    </button>
+    <button class="admin-tab"        data-tab="os"            onclick="Admin.tab('os')">
+      <span class="material-icons-round">assignment</span> OS
+    </button>
+    <button class="admin-tab"        data-tab="colaboradores" onclick="Admin.tab('colaboradores')">
+      <span class="material-icons-round">group</span> Equipe
+    </button>
+    <button class="admin-tab"        data-tab="locais"        onclick="Admin.tab('locais')">
+      <span class="material-icons-round">location_on</span> Locais
+    </button>
+  </nav>
+
+  <div class="admin-body">
+
+    <!-- Tab: Dashboard -->
+    <div class="admin-section active" id="tab-dashboard">
+      <div class="stats-row" style="margin-top:1rem;">
+        <div class="stat-card stat-card--blue">
+          <div class="stat-num" id="aDashColabs">—</div>
+          <div class="stat-lbl">Colaboradores</div>
+        </div>
+        <div class="stat-card stat-card--green">
+          <div class="stat-num" id="aDashPontos">—</div>
+          <div class="stat-lbl">Pontos Hoje</div>
+        </div>
+        <div class="stat-card stat-card--red">
+          <div class="stat-num" id="aDashVencidas">—</div>
+          <div class="stat-lbl">OS Vencidas</div>
+        </div>
+      </div>
+      <div class="section-heading">
+        <h3>Últimos Pontos</h3>
+      </div>
+      <div class="data-list" id="adminRecentPontos">
+        <div class="state-box"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- Tab: Pontos -->
+    <div class="admin-section" id="tab-pontos">
+      <div class="section-heading" style="margin-top:1rem;">
+        <h3>Registros de Ponto</h3>
+        <input type="date" id="pontoFiltroData" class="form-input"
+               style="width:auto;padding:0.5rem 0.75rem;font-size:0.9rem;"
+               onchange="Admin.loadPontos()">
+      </div>
+      <div class="search-wrap" style="margin-bottom:0.75rem;">
+        <span class="material-icons-round">search</span>
+        <input class="search-input" type="search" id="pontoFiltroNome"
+               placeholder="Buscar colaborador…" oninput="Admin.filtrarPontos()">
+      </div>
+      <div class="data-list" id="adminPontosList">
+        <div class="state-box"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- Tab: OS (admin) -->
+    <div class="admin-section" id="tab-os">
+      <div class="section-heading" style="margin-top:1rem;">
+        <h3>Ordens de Serviço</h3>
+        <button class="btn btn-primary btn-sm" onclick="OS.reload()">
+          <span class="material-icons-round">refresh</span> Atualizar
+        </button>
+      </div>
+      <div class="pills-scroll" role="group">
+        <button class="pill active" data-af="all"       onclick="OS.setFilter('all',true)">Todas</button>
+        <button class="pill"        data-af="overdue"   onclick="OS.setFilter('overdue',true)">🔴 Vencidas</button>
+        <button class="pill"        data-af="today"     onclick="OS.setFilter('today',true)">🟠 Hoje</button>
+        <button class="pill"        data-af="week"      onclick="OS.setFilter('week',true)">🟡 Semana</button>
+        <button class="pill"        data-af="fortnight" onclick="OS.setFilter('fortnight',true)">🟢 14 Dias</button>
+      </div>
+      <div class="search-wrap" style="margin-top:0.85rem;">
+        <span class="material-icons-round">search</span>
+        <input class="search-input" type="search" id="adminOsSearch"
+               placeholder="Buscar OS…" oninput="OS.renderAdmin()">
+      </div>
+      <div class="os-list" id="adminOsList" style="margin-top:0.85rem;">
+        <div class="state-box"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- Tab: Colaboradores -->
+    <div class="admin-section" id="tab-colaboradores">
+      <div class="section-heading" style="margin-top:1rem;">
+        <h3>Equipe</h3>
+        <button class="btn btn-primary btn-sm" onclick="Admin.openColabModal()">
+          <span class="material-icons-round">person_add</span> Novo Colaborador
+        </button>
+      </div>
+      <div class="data-list" id="adminColabList">
+        <div class="state-box"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- Tab: Locais -->
+    <div class="admin-section" id="tab-locais">
+      <div class="section-heading" style="margin-top:1rem;">
+        <h3>Locais Permitidos</h3>
+        <button class="btn btn-primary btn-sm" onclick="Admin.openLocalModal()">
+          <span class="material-icons-round">add_location</span> Adicionar
+        </button>
+      </div>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;">
+        Colaboradores só podem bater ponto dentro do raio cadastrado.
+      </p>
+      <div class="data-list" id="adminLocaisList">
+        <div class="state-box"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+  </div><!-- /admin-body -->
+</div><!-- /screen-admin -->
+
+<!-- ================================================
+     BOTTOM NAV (Colaborador)
+================================================ -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="nav-btn active" data-nav="colab-home" onclick="Router.go('colab-home')">
+    <span class="material-icons-round">home</span>
+    <span>Início</span>
+  </button>
+  <button class="nav-btn" data-nav="os" onclick="Router.go('os')">
+    <span class="material-icons-round">assignment</span>
+    <span>OS</span>
+  </button>
+  <button class="nav-btn" data-nav="ponto" onclick="Ponto.init()">
+    <span class="material-icons-round">fingerprint</span>
+    <span>Ponto</span>
+  </button>
+</nav>
+
+<!-- ================================================
+     MODAL: Local Permitido
+================================================ -->
+<div class="modal-overlay" id="modalLocal">
+  <div class="modal-box">
+    <div class="modal-title" id="modalLocalTitle">Novo Local</div>
+    <form id="localForm">
+      <input type="hidden" id="localId">
+      <input type="hidden" id="localLat">
+      <input type="hidden" id="localLon">
+      <input type="hidden" id="localLogradouro">
+      <input type="hidden" id="localCidade">
+      <input type="hidden" id="localUf">
+
+      <div class="form-group">
+        <label class="form-label">Nome do local</label>
+        <input class="form-input" type="text" id="localNome"
+               placeholder="Ex: Sede Administrativa" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">CEP</label>
+        <div style="display:flex;gap:0.5rem;align-items:flex-start;">
+          <input class="form-input" type="text" id="localCep" placeholder="00000-000"
+                 maxlength="9" style="flex:1"
+                 oninput="Admin.formatCep(this)" onblur="Admin.buscarCep()">
+          <button type="button" class="btn btn-ghost btn-sm"
+                  onclick="Admin.buscarCep()"
+                  style="white-space:nowrap;padding:0.6rem 0.9rem;">
+            <span class="material-icons-round" style="font-size:1.1rem;">search</span>
+          </button>
+        </div>
+        <div id="cepStatus" style="font-size:0.8rem;color:var(--muted);margin-top:0.3rem;min-height:1rem;"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Rua / Logradouro</label>
+        <input class="form-input" type="text" id="localRua"
+               placeholder="Preenchido pelo CEP" style="background:var(--bg);" readonly>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Número</label>
+        <input class="form-input" type="text" id="localNumero" placeholder="Ex: 123">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Raio permitido (km)</label>
+        <input class="form-input" type="number" id="localRaioKm" value="0.5"
+               min="0.05" max="50" step="0.05" required
+               oninput="Admin.updateRaioHint(this.value)">
+        <div id="raioHint" style="font-size:0.8rem;color:var(--muted);margin-top:0.3rem;">= 500 metros</div>
+      </div>
+
+      <button type="button" class="btn btn-ghost btn-sm"
+              onclick="Admin.usarGPSLocal()"
+              style="width:100%;margin-bottom:0.4rem;">
+        <span class="material-icons-round">my_location</span> Usar minha localização (GPS)
+      </button>
+      <div id="gpsStatus"
+           style="font-size:0.8rem;color:var(--muted);text-align:center;margin-bottom:1rem;min-height:1rem;"></div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost"
+                onclick="UI.closeModal('modalLocal')" style="flex:1">Cancelar</button>
+        <button type="submit" class="btn btn-primary" style="flex:1">
+          <span class="material-icons-round">save</span> Salvar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================================================
+     MODAL: Colaborador
+================================================ -->
+<div class="modal-overlay" id="modalColab">
+  <div class="modal-box">
+    <div class="modal-title" id="colabModalTitle">Novo Colaborador</div>
+    <form id="colabForm">
+      <input type="hidden" id="colabId">
+
+      <!-- Campos de conta — visíveis apenas ao criar -->
+      <div id="colabContaFields">
+        <div class="modal-section-title">Conta de acesso</div>
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input class="form-input" type="email" id="colabEmail" placeholder="email@exemplo.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input class="form-input" type="password" id="colabSenha"
+                 placeholder="Mínimo 6 caracteres" minlength="6">
+        </div>
+      </div>
+
+      <div class="modal-section-title">Dados pessoais</div>
+      <div class="form-group">
+        <label class="form-label">Nome completo</label>
+        <input class="form-input" type="text" id="colabNome" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cargo / Setor</label>
+        <input class="form-input" type="text" id="colabCargo"
+               placeholder="Ex: Limpeza, Manutenção…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Função no sistema</label>
+        <select class="form-select" id="colabRole">
+          <option value="colaborador">Colaborador</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <div class="form-group" id="colabAtivoGroup">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="colabAtivo">
+          <option value="true">Ativo</option>
+          <option value="false">Inativo</option>
+        </select>
+      </div>
+
+      <div class="modal-section-title">Acessos permitidos</div>
+      <div class="perm-group">
+        <label class="perm-item">
+          <input type="checkbox" id="permOS" value="os">
+          <span class="material-icons-round perm-icon">assignment</span>
+          <div>
+            <div class="perm-label">Ordens de Serviço</div>
+            <div class="perm-desc">Visualiza e acompanha as OS da equipe</div>
+          </div>
+        </label>
+        <label class="perm-item">
+          <input type="checkbox" id="permPonto" value="ponto">
+          <span class="material-icons-round perm-icon">fingerprint</span>
+          <div>
+            <div class="perm-label">Bater Ponto</div>
+            <div class="perm-desc">Registra entrada, intervalo e saída</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="modal-actions" style="margin-top:1.25rem;">
+        <button type="button" class="btn btn-ghost"
+                onclick="UI.closeModal('modalColab')" style="flex:1">Cancelar</button>
+        <button type="submit" class="btn btn-primary" style="flex:1" id="colabSubmitBtn">
+          <span class="material-icons-round">person_add</span> Criar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Entry point (ES module) -->
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

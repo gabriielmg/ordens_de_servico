@@ -1,0 +1,322 @@
+/* ==========================================================
+   SCREENS — Estilos específicos por tela
+========================================================== */
+
+/* ----------------------------------------------------------
+   LOGIN
+---------------------------------------------------------- */
+#screen-login {
+  background: var(--navy);
+  align-items: center; justify-content: center;
+  padding: 1.5rem;
+}
+
+.login-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 2.25rem 1.75rem;
+  width: 100%; max-width: 380px;
+  box-shadow: var(--shadow-md);
+}
+
+.login-logo         { text-align: center; margin-bottom: 2rem; }
+.login-logo-icon {
+  width: 70px; height: 70px;
+  background: var(--blue-bg); border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 0.9rem;
+}
+.login-logo-icon .material-icons-round { font-size: 2.2rem; color: var(--blue); }
+.login-title         { font-size: 1.85rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+.login-title span    { color: var(--blue); }
+.login-subtitle      { color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; }
+
+#authMsg {
+  text-align: center; margin-top: 0.85rem;
+  font-size: 0.9rem; font-weight: 600; min-height: 20px; color: var(--red);
+}
+
+/* ----------------------------------------------------------
+   COLABORADOR HOME
+---------------------------------------------------------- */
+#screen-colab-home .home-body,
+#screen-admin-home .home-body {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 1.5rem 1.1rem 6rem;
+  gap: 1rem;
+}
+#screen-admin-home .home-body { padding-bottom: 2rem; }
+
+.home-greeting       { margin-bottom: 0.5rem; }
+.home-greeting h2    { font-size: 1.5rem; font-weight: 800; color: var(--text); }
+.home-greeting p     { font-size: 0.95rem; color: var(--muted); margin-top: 0.2rem; }
+
+.home-big-btn {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0.9rem;
+  padding: 2rem 1rem;
+  border: none; border-radius: var(--radius);
+  font-family: inherit; font-weight: 800;
+  font-size: 1.25rem; color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: transform .12s, box-shadow .12s;
+  min-height: 140px;
+  text-align: center; line-height: 1.2;
+}
+.home-big-btn:active { transform: scale(0.97); box-shadow: var(--shadow); }
+.home-big-btn .material-icons-round { font-size: 3rem; }
+
+.home-big-btn--os     { background: linear-gradient(135deg, #2563EB, #1E40AF); }
+.home-big-btn--ponto  { background: linear-gradient(135deg, #15803D, #166534); }
+.home-big-btn--gestao { background: linear-gradient(135deg, #7C3AED, #5B21B6); }
+
+/* ----------------------------------------------------------
+   OS LIST
+---------------------------------------------------------- */
+#screen-os .os-body {
+  flex: 1; overflow-y: auto; padding: 1.1rem 1rem 6rem;
+}
+
+/* KPI Cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem; margin-bottom: 1.25rem;
+}
+
+.kpi-card {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 1rem 0.9rem 0.85rem;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  border: 2.5px solid transparent;
+  position: relative; overflow: hidden;
+  user-select: none;
+  transition: transform .12s, box-shadow .12s;
+}
+.kpi-card:active  { transform: scale(0.96); }
+.kpi-card.selected { border-color: currentColor; box-shadow: var(--shadow-md); }
+.kpi-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; border-radius: 3px 3px 0 0;
+}
+.kpi-card--total          { grid-column: 1 / -1; display: flex; align-items: center; gap: 1rem; }
+.kpi-card--total::before   { background: var(--blue); }
+.kpi-card--overdue::before { background: var(--red); }
+.kpi-card--today::before   { background: var(--orange); }
+.kpi-card--week::before    { background: var(--yellow); }
+.kpi-card--fort::before    { background: var(--green); }
+
+.kpi-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.kpi-icon .material-icons-round { font-size: 1.5rem; }
+.kpi-card--total   .kpi-icon { background: var(--blue-bg);   color: var(--blue); }
+.kpi-card--overdue .kpi-icon { background: var(--red-bg);    color: var(--red); }
+.kpi-card--today   .kpi-icon { background: var(--orange-bg); color: var(--orange); }
+.kpi-card--week    .kpi-icon { background: var(--yellow-bg); color: var(--yellow); }
+.kpi-card--fort    .kpi-icon { background: var(--green-bg);  color: var(--green); }
+
+.kpi-num { font-size: 2.1rem; font-weight: 800; line-height: 1; margin-bottom: 0.2rem; }
+.kpi-card--total   .kpi-num { color: var(--blue);   font-size: 2.4rem; }
+.kpi-card--overdue .kpi-num { color: var(--red); }
+.kpi-card--today   .kpi-num { color: var(--orange); }
+.kpi-card--week    .kpi-num { color: var(--yellow); }
+.kpi-card--fort    .kpi-num { color: var(--green); }
+
+.kpi-lbl {
+  font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted);
+}
+
+.chapel-select {
+  width: 100%; padding: 0.8rem 2.4rem 0.8rem 0.9rem;
+  background: var(--card); border: 2px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 0.97rem;
+  font-family: inherit; color: var(--text);
+  box-shadow: var(--shadow); cursor: pointer; outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%2364748B' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.7rem center;
+  margin-bottom: 1rem; transition: border-color .2s;
+}
+.chapel-select:focus { border-color: var(--blue); }
+
+.list-header {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 0.75rem;
+}
+.list-header-title { font-size: 0.97rem; font-weight: 800; color: var(--text); }
+.list-header-count {
+  background: var(--border); color: var(--muted);
+  font-size: 0.78rem; font-weight: 700;
+  padding: 0.2rem 0.65rem; border-radius: 999px;
+}
+
+/* OS Cards */
+.os-list { display: flex; flex-direction: column; gap: 0.7rem; }
+
+.os-card {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden;
+  border-left: 5px solid var(--border);
+  animation: fadeUp .2s ease both;
+}
+.os-card.overdue { border-left-color: var(--red); }
+.os-card.today   { border-left-color: var(--orange); }
+.os-card.week    { border-left-color: var(--yellow); }
+.os-card.future  { border-left-color: var(--green); }
+
+.os-card-inner { padding: 1rem 1.1rem; }
+.os-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 0.7rem; margin-bottom: 0.4rem;
+}
+.os-chapel  { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
+.os-subject { font-size: 1.05rem; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 0.65rem; }
+.os-footer  { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.os-num     { font-size: 0.78rem; font-weight: 700; color: var(--muted); background: var(--bg); padding: 0.2rem 0.55rem; border-radius: 6px; }
+.os-date    { font-size: 0.83rem; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 2px; }
+.os-date .material-icons-round { font-size: 0.95rem; opacity: 0.6; }
+.os-days    { font-size: 0.85rem; font-weight: 800; margin-left: auto; }
+.os-card.overdue .os-days { color: var(--red); }
+.os-card.today   .os-days { color: var(--orange); }
+.os-card.week    .os-days { color: var(--yellow); }
+.os-card.future  .os-days { color: var(--green); }
+.os-desc {
+  margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);
+  font-size: 0.875rem; color: var(--muted); line-height: 1.5;
+}
+
+/* ----------------------------------------------------------
+   BATER PONTO
+---------------------------------------------------------- */
+#screen-ponto .ponto-body {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 1.25rem 1.1rem 2rem; gap: 1rem;
+}
+
+.ponto-step        { display: none; flex-direction: column; gap: 1rem; }
+.ponto-step.active { display: flex; }
+
+.ponto-location-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 1.5rem; text-align: center; box-shadow: var(--shadow);
+}
+.ponto-location-card .material-icons-round { font-size: 3rem; color: var(--blue); margin-bottom: 0.75rem; }
+.ponto-location-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.3rem; }
+.ponto-location-card p  { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
+
+.ponto-tipo-card {
+  display: flex; align-items: center; gap: 0.9rem;
+  background: var(--card); border-radius: var(--radius);
+  padding: 1rem 1.25rem; box-shadow: var(--shadow-md);
+  border-left: 5px solid var(--blue);
+}
+.ponto-tipo-card .material-icons-round { font-size: 2rem; }
+.ponto-tipo-nome { font-size: 1.05rem; font-weight: 800; }
+.ponto-tipo-desc { font-size: 0.82rem; color: var(--muted); margin-top: 0.1rem; }
+
+.camera-wrap {
+  position: relative; background: #000;
+  border-radius: var(--radius); overflow: hidden;
+  aspect-ratio: 3/4; width: 100%; max-height: 60vh;
+}
+#cameraVideo {
+  width: 100%; height: 100%; object-fit: cover;
+  transform: scaleX(-1);
+}
+#capturedImg { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+.capture-btn {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: #fff; border: 4px solid var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto; box-shadow: var(--shadow-md);
+  transition: transform .12s;
+}
+.capture-btn:active { transform: scale(0.93); }
+.capture-btn .material-icons-round { font-size: 2rem; color: var(--blue); }
+
+.ponto-result {
+  background: var(--card); border-radius: var(--radius);
+  padding: 2rem 1.5rem; text-align: center; box-shadow: var(--shadow);
+}
+.ponto-result .result-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1rem;
+}
+.ponto-result .result-icon .material-icons-round { font-size: 2.5rem; color: #fff; }
+.ponto-result.success .result-icon { background: var(--green); }
+.ponto-result.error   .result-icon { background: var(--red); }
+.ponto-result h3 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+.ponto-result p  { font-size: 0.95rem; color: var(--muted); line-height: 1.5; }
+
+/* ----------------------------------------------------------
+   ADMIN GESTÃO
+---------------------------------------------------------- */
+#screen-admin .admin-body {
+  flex: 1; overflow-y: auto; padding: 1.1rem 1rem 2rem;
+}
+
+.admin-tabs {
+  display: flex; overflow-x: auto; gap: 0;
+  background: var(--card); border-bottom: 2px solid var(--border);
+  position: sticky; top: 60px; z-index: 40; scrollbar-width: none;
+  flex-shrink: 0;
+}
+.admin-tabs::-webkit-scrollbar { display: none; }
+
+.admin-tab {
+  flex-shrink: 0; padding: 0.85rem 1.1rem;
+  border: none; background: transparent;
+  font-size: 0.85rem; font-weight: 700; font-family: inherit;
+  color: var(--muted); cursor: pointer;
+  border-bottom: 3px solid transparent; margin-bottom: -2px;
+  transition: color .15s, border-color .15s;
+  display: flex; align-items: center; gap: 0.35rem;
+}
+.admin-tab .material-icons-round { font-size: 1.1rem; }
+.admin-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+.admin-section        { display: none; }
+.admin-section.active { display: block; }
+
+.stats-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem; margin-bottom: 1.25rem;
+}
+.stat-card {
+  background: var(--card); border-radius: var(--radius-sm);
+  padding: 1rem 0.75rem; text-align: center;
+  box-shadow: var(--shadow);
+}
+.stat-num            { font-size: 1.75rem; font-weight: 800; line-height: 1; margin-bottom: 0.25rem; }
+.stat-lbl            { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+.stat-card--blue  .stat-num { color: var(--blue); }
+.stat-card--green .stat-num { color: var(--green); }
+.stat-card--red   .stat-num { color: var(--red); }
+
+/* ----------------------------------------------------------
+   RESPONSIVE — Tablet / Desktop
+---------------------------------------------------------- */
+@media (min-width: 580px) {
+  .kpi-grid                 { grid-template-columns: repeat(5, 1fr); }
+  .kpi-card--total          { grid-column: auto; display: block; }
+  .kpi-card--total .kpi-icon { display: none; }
+  .kpi-num                  { font-size: 1.9rem; }
+  .kpi-card--total .kpi-num { font-size: 2rem; }
+}
+
+@media (min-width: 700px) {
+  #screen-os .os-body,
+  #screen-admin .admin-body    { max-width: 760px; margin: 0 auto; }
+  #screen-colab-home .home-body { max-width: 480px; margin: 0 auto; }
+  .home-big-btn                 { min-height: 180px; }
+}
